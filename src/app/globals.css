@@ -3,101 +3,101 @@
 @tailwind utilities;
 
 body {
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif; /* Updated to use --font-sans */
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
 @layer base {
   :root {
-    --background: 201 100% 5%; /* Deep space dark blue */
-    --foreground: 210 40% 96%; /* Light text for readability */
+    --background: 240 50% 6%; /* Very dark desaturated blue */
+    --foreground: 200 100% 90%; /* Light cyan-ish white */
 
-    --card: 201 90% 10%; /* Slightly lighter dark blue for card elements */
-    --card-foreground: 210 40% 96%;
+    --card: 240 40% 10%; /* Darker panel for cards */
+    --card-foreground: 200 100% 90%;
 
-    --popover: 201 90% 10%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 240 40% 9%; /* Popover background */
+    --popover-foreground: 200 100% 90%;
 
-    --primary: 197 71% 73%; /* Sky blue for main interactive elements */
-    --primary-foreground: 201 100% 14.5%; /* Dark blue text on sky blue buttons */
+    --primary: 180 100% 50%; /* Pure Cyan */
+    --primary-foreground: 240 50% 5%; /* Dark text on cyan */
 
-    --secondary: 201 80% 25%; /* A darker blue, less prominent */
-    --secondary-foreground: 210 40% 96%;
+    --secondary: 260 60% 40%; /* Deep vibrant purple */
+    --secondary-foreground: 200 100% 90%;
 
-    --muted: 201 70% 20%; /* Muted tones */
-    --muted-foreground: 210 40% 80%;
+    --muted: 240 30% 25%; /* Muted tones */
+    --muted-foreground: 200 80% 75%;
 
-    --accent: 45 100% 49.8%; /* Yellow for highlights, scores, indicators */
-    --accent-foreground: 201 100% 14.5%; /* Dark text on yellow */
+    --accent: 300 100% 60%; /* Vibrant Magenta */
+    --accent-foreground: 240 50% 5%; /* Dark text on magenta */
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 70% 55%; /* Bright red for destructive actions */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 201 70% 20%; /* Subtle border color */
-    --input: 201 70% 15%; /* Input background */
-    --ring: 197 71% 65%; /* Sky blue ring for focus */
+    --border: 180 80% 40%; /* Slightly desaturated cyan for borders */
+    --input: 240 30% 18%; /* Input background */
+    --ring: 180 100% 60%; /* Brighter cyan for focus rings */
 
-    --chart-1: 197 71% 73%;
-    --chart-2: 45 100% 49.8%;
-    --chart-3: 201 80% 25%;
-    --chart-4: 210 40% 96%;
-    --chart-5: 0 84.2% 60.2%;
+    --chart-1: 180 100% 50%; /* Cyan */
+    --chart-2: 300 100% 60%; /* Magenta */
+    --chart-3: 260 60% 40%; /* Purple */
+    --chart-4: 200 100% 90%; /* Light Cyan White */
+    --chart-5: 0 70% 55%;   /* Red */
     --radius: 0.5rem;
 
-    /* Sidebar colors - adjust if sidebar is used, otherwise default to theme */
-    --sidebar-background: 201 100% 8%;
-    --sidebar-foreground: 210 40% 90%;
-    --sidebar-primary: 197 71% 73%;
-    --sidebar-primary-foreground: 201 100% 14.5%;
-    --sidebar-accent: 45 100% 49.8%;
-    --sidebar-accent-foreground: 201 100% 14.5%;
-    --sidebar-border: 201 70% 20%;
-    --sidebar-ring: 197 71% 65%;
+    /* Sidebar colors - updated to match new theme */
+    --sidebar-background: 240 50% 8%;
+    --sidebar-foreground: 200 100% 85%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 240 50% 5%;
+    --sidebar-accent: 300 100% 60%;
+    --sidebar-accent-foreground: 240 50% 5%;
+    --sidebar-border: 180 80% 30%;
+    --sidebar-ring: 180 100% 60%;
   }
 
   .dark {
-    /* Dark theme can be same as light for this space theme, or adjusted if needed */
-    --background: 201 100% 5%;
-    --foreground: 210 40% 96%;
+    /* Dark theme is the default and only theme for this sci-fi look */
+    --background: 240 50% 6%;
+    --foreground: 200 100% 90%;
 
-    --card: 201 90% 10%;
-    --card-foreground: 210 40% 96%;
+    --card: 240 40% 10%;
+    --card-foreground: 200 100% 90%;
 
-    --popover: 201 90% 10%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 240 40% 9%;
+    --popover-foreground: 200 100% 90%;
 
-    --primary: 197 71% 73%;
-    --primary-foreground: 201 100% 14.5%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 240 50% 5%;
 
-    --secondary: 201 80% 25%;
-    --secondary-foreground: 210 40% 96%;
+    --secondary: 260 60% 40%;
+    --secondary-foreground: 200 100% 90%;
 
-    --muted: 201 70% 20%;
-    --muted-foreground: 210 40% 80%;
+    --muted: 240 30% 25%;
+    --muted-foreground: 200 80% 75%;
 
-    --accent: 45 100% 49.8%;
-    --accent-foreground: 201 100% 14.5%;
+    --accent: 300 100% 60%;
+    --accent-foreground: 240 50% 5%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 201 70% 20%;
-    --input: 201 70% 15%;
-    --ring: 197 71% 65%;
+    --border: 180 80% 40%;
+    --input: 240 30% 18%;
+    --ring: 180 100% 60%;
     
-    --chart-1: 197 71% 73%;
-    --chart-2: 45 100% 49.8%;
-    --chart-3: 201 80% 25%;
-    --chart-4: 210 40% 96%;
-    --chart-5: 0 62.8% 30.6%;
+    --chart-1: 180 100% 50%;
+    --chart-2: 300 100% 60%;
+    --chart-3: 260 60% 40%;
+    --chart-4: 200 100% 90%;
+    --chart-5: 0 60% 50%;
 
-    --sidebar-background: 201 100% 8%;
-    --sidebar-foreground: 210 40% 90%;
-    --sidebar-primary: 197 71% 73%;
-    --sidebar-primary-foreground: 201 100% 14.5%;
-    --sidebar-accent: 45 100% 49.8%;
-    --sidebar-accent-foreground: 201 100% 14.5%;
-    --sidebar-border: 201 70% 20%;
-    --sidebar-ring: 197 71% 65%;
+    --sidebar-background: 240 50% 8%;
+    --sidebar-foreground: 200 100% 85%;
+    --sidebar-primary: 180 100% 50%;
+    --sidebar-primary-foreground: 240 50% 5%;
+    --sidebar-accent: 300 100% 60%;
+    --sidebar-accent-foreground: 240 50% 5%;
+    --sidebar-border: 180 80% 30%;
+    --sidebar-ring: 180 100% 60%;
   }
 }
 
@@ -108,4 +108,38 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Score animation */
+@keyframes score-pulse-animation {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow: 0 0 5px hsl(var(--accent) / 0.7);
+  }
+  50% {
+    transform: scale(1.15);
+    text-shadow: 0 0 15px hsl(var(--accent)), 0 0 25px hsl(var(--accent) / 0.7);
+  }
+}
+
+.animate-score-pulse {
+  animation: score-pulse-animation 0.5s ease-in-out;
+}
+
+/* Neon glow effect for buttons and cards */
+.neon-glow-primary {
+  box-shadow: 0 0 5px hsl(var(--primary)),
+              0 0 10px hsl(var(--primary) / 0.8),
+              0 0 15px hsl(var(--primary) / 0.6);
+}
+.neon-glow-accent {
+   box-shadow: 0 0 5px hsl(var(--accent)),
+              0 0 10px hsl(var(--accent) / 0.8),
+              0 0 15px hsl(var(--accent) / 0.6);
+}
+
+.hover-neon-glow-primary:hover {
+  box-shadow: 0 0 8px hsl(var(--primary)),
+              0 0 15px hsl(var(--primary) / 0.8),
+              0 0 25px hsl(var(--primary) / 0.6);
 }

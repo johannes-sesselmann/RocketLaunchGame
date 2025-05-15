@@ -2,8 +2,10 @@
 "use client";
 
 import type { FC } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock, User, Bot } from 'lucide-react';
+import { ClockIcon, UserIcon, BotIcon } from 'lucide-react'; // Updated to specific icons
+import { cn } from '@/lib/utils';
 
 interface ScoreBoardProps {
   playerScore: number;
@@ -11,37 +13,59 @@ interface ScoreBoardProps {
   timeLeft: number;
 }
 
+const ScoreDisplay: FC<{ score: number; initialScore: number; label: string; icon: React.ReactNode }> = ({ score, initialScore, label, icon }) => {
+  const [displayScore, setDisplayScore] = useState(initialScore);
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    if (score !== displayScore) {
+      setDisplayScore(score);
+      setAnimate(true);
+      const timer = setTimeout(() => setAnimate(false), 500); // Match CSS animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [score, displayScore]);
+
+  return (
+    <div className="flex flex-col items-center space-y-2 p-2">
+      <div className="flex items-center text-foreground/80 text-sm">
+        {icon}
+        <span className="ml-2 uppercase tracking-wider">{label}</span>
+      </div>
+      <span 
+        className={cn(
+          "text-4xl font-bold text-accent font-mono",
+          { "animate-score-pulse": animate }
+        )}
+      >
+        {displayScore}
+      </span>
+    </div>
+  );
+};
+
+
 const ScoreBoard: FC<ScoreBoardProps> = ({ playerScore, aiScore, timeLeft }) => {
   return (
-    <Card className="w-full max-w-md shadow-xl">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-center text-2xl font-bold tracking-wider text-primary">Rocket Rumble</CardTitle>
+    <Card className="w-full shadow-xl bg-card/80 backdrop-blur-sm border-primary/50 neon-glow-primary">
+      <CardHeader className="pb-2 pt-4">
+        <CardTitle className="text-center text-3xl font-bold tracking-widest text-primary uppercase font-mono">
+          Rocket Rumble
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-2 pb-4">
         <div className="flex justify-around items-center text-lg">
-          <div className="flex flex-col items-center space-y-1">
-            <div className="flex items-center text-foreground">
-              <User className="mr-2 h-6 w-6 text-accent" />
-              <span>Player</span>
+          <ScoreDisplay score={playerScore} initialScore={0} label="Player" icon={<UserIcon className="h-5 w-5 text-primary" />} />
+          
+          <div className="flex flex-col items-center space-y-2 p-2">
+             <div className="flex items-center text-foreground/80 text-sm">
+              <ClockIcon className="mr-2 h-5 w-5 text-foreground/70" />
+              <span className="uppercase tracking-wider">Time Left</span>
             </div>
-            <span className="text-3xl font-bold text-accent">{playerScore}</span>
+            <span className="text-4xl font-bold text-foreground font-mono">{timeLeft}s</span>
           </div>
 
-          <div className="flex flex-col items-center space-y-1">
-             <div className="flex items-center text-foreground">
-              <Clock className="mr-2 h-6 w-6" />
-              <span>Time</span>
-            </div>
-            <span className="text-3xl font-bold">{timeLeft}s</span>
-          </div>
-
-          <div className="flex flex-col items-center space-y-1">
-            <div className="flex items-center text-foreground">
-              <Bot className="mr-2 h-6 w-6 text-accent" />
-              <span>AI</span>
-            </div>
-            <span className="text-3xl font-bold text-accent">{aiScore}</span>
-          </div>
+          <ScoreDisplay score={aiScore} initialScore={0} label="System AI" icon={<BotIcon className="h-5 w-5 text-destructive" />} />
         </div>
       </CardContent>
     </Card>

@@ -9,6 +9,7 @@ import StartButton from '@/components/game/StartButton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Toaster } from '@/components/ui/toaster';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 import type { Rocket, Target, GameStatus, PlayerAction } from '@/types';
 import {
@@ -72,7 +73,7 @@ export default function RocketRumblePage() {
   const handleStartGame = () => {
     resetGame();
     setGameStatus('running');
-    toast({ title: "Match Started!", description: "Reach the targets to score points!" });
+    toast({ title: "Match Initiated!", description: "Objective: Secure targets. Evade opponent.", className: "font-mono" });
   };
 
   const handleIQChange = (value: number) => {
@@ -82,22 +83,19 @@ export default function RocketRumblePage() {
   const updateRocketPhysics = useCallback((rocket: Rocket, playerInput?: Set<PlayerAction>, aiInput?: AdjustRocketTrajectoryOutput): Rocket => {
     let newRocket = { ...rocket };
 
-    // Apply player/AI inputs
     if (playerInput) {
       if (playerInput.has('thrustOn')) newRocket.thrust = 1;
-      else newRocket.thrust = 0; // thrustOff is implicit if thrustOn is not present
+      else newRocket.thrust = 0;
       
       if (playerInput.has('rotateLeft')) newRocket.angle -= ROTATION_SPEED;
       if (playerInput.has('rotateRight')) newRocket.angle += ROTATION_SPEED;
     } else if (aiInput) {
       newRocket.thrust = aiInput.thrustAdjustment > 0 ? 1 : 0;
-      newRocket.angle += aiInput.rotationAdjustment * ROTATION_SPEED * 5; // Make AI rotation more responsive
+      newRocket.angle += aiInput.rotationAdjustment * ROTATION_SPEED * 5; 
     } else {
-       newRocket.thrust = 0; // Default to no thrust if no input
+       newRocket.thrust = 0;
     }
 
-
-    // Physics
     newRocket.vy += GRAVITY;
 
     if (newRocket.thrust > 0) {
@@ -108,12 +106,10 @@ export default function RocketRumblePage() {
     newRocket.x += newRocket.vx;
     newRocket.y += newRocket.vy;
 
-    // Boundary checks (simple stop at boundary)
     if (newRocket.x - newRocket.size / 2 < 0) { newRocket.x = newRocket.size / 2; newRocket.vx = 0; }
     if (newRocket.x + newRocket.size / 2 > GAME_WIDTH) { newRocket.x = GAME_WIDTH - newRocket.size / 2; newRocket.vx = 0; }
     if (newRocket.y - newRocket.size / 2 < 0) { newRocket.y = newRocket.size / 2; newRocket.vy = 0; }
     if (newRocket.y + newRocket.size / 2 > GAME_HEIGHT) { newRocket.y = GAME_HEIGHT - newRocket.size / 2; newRocket.vy = 0; newRocket.vx = 0; }
-
 
     return newRocket;
   }, []);
@@ -127,32 +123,31 @@ export default function RocketRumblePage() {
 
 
   const gameLoop = useCallback(() => {
-    // Update player rocket
     setPlayerRocket(prev => updateRocketPhysics(prev, playerActionsRef.current));
     
-    // AI rocket is updated by its timer effect
-
-    // Check collisions
     setTargets(prevTargets => {
       let newTargets = [...prevTargets];
-      let playerHit = false;
-      let aiHit = false;
+      let playerHitThisFrame = false;
+      let aiHitThisFrame = false;
 
       newTargets = newTargets.filter(target => {
-        if (checkCollision(playerRocket, target)) {
+        const currentPRocket = playerRocket; // Use state value at the moment of check for consistency
+        const currentAIRocket = aiRocket;
+
+        if (checkCollision(currentPRocket, target)) {
           setPlayerScore(s => s + 1);
-          playerHit = true;
-          return false; // Remove target
+          playerHitThisFrame = true;
+          return false;
         }
-        if (checkCollision(aiRocket, target)) {
+        if (checkCollision(currentAIRocket, target)) {
           setAiScore(s => s + 1);
-          aiHit = true;
-          return false; // Remove target
+          aiHitThisFrame = true;
+          return false;
         }
         return true;
       });
 
-      if (playerHit || aiHit) {
+      if (playerHitThisFrame || aiHitThisFrame) {
          const numTargetsToAdd = MAX_TARGETS - newTargets.length;
          for(let i=0; i < numTargetsToAdd; i++) {
             newTargets.push(spawnTarget());
@@ -165,12 +160,11 @@ export default function RocketRumblePage() {
   }, [playerRocket, aiRocket, updateRocketPhysics, checkCollision, spawnTarget]);
 
 
-  // AI decision making loop
   useEffect(() => {
     if (gameStatus === 'running') {
       aiTimerRef.current = setInterval(async () => {
-        if (targets.length === 0) return; // No target, AI waits
-        const currentTarget = targets[0]; // Simplistic: AI always aims for the first target
+        if (targets.length === 0) return; 
+        const currentTarget = targets[0]; 
         
         const input: AdjustRocketTrajectoryInput = {
           playerRocketPositionX: playerRocket.x,
@@ -186,7 +180,6 @@ export default function RocketRumblePage() {
           setAiRocket(prev => updateRocketPhysics(prev, undefined, aiDecision));
         } catch (error) {
           console.error("AI trajectory adjustment error:", error);
-          // AI might do nothing or a default action on error
           setAiRocket(prev => updateRocketPhysics(prev, undefined, { thrustAdjustment: 0, rotationAdjustment: 0}));
         }
       }, AI_DECISION_INTERVAL);
@@ -197,7 +190,6 @@ export default function RocketRumblePage() {
   }, [gameStatus, aiRocket, playerRocket, targets, selectedIQ, updateRocketPhysics]);
 
 
-  // Game timer effect
   useEffect(() => {
     if (gameStatus === 'running') {
       timerRef.current = setInterval(() => {
@@ -205,10 +197,13 @@ export default function RocketRumblePage() {
           if (prevTime <= 1) {
             setGameStatus('over');
             if (timerRef.current) clearInterval(timerRef.current);
+            const finalPlayerScore = playerScore; // Capture current score for toast
+            const finalAiScore = aiScore;
             toast({ 
-              title: "Match Over!", 
-              description: `Player: ${playerScore}, AI: ${aiScore}. ${playerScore > aiScore ? "You win!" : playerScore < aiScore ? "AI wins!" : "It's a tie!"}`,
-              variant: playerScore > aiScore ? "default" : "destructive"
+              title: "Match Concluded!", 
+              description: `Player: ${finalPlayerScore}, AI: ${finalAiScore}. ${finalPlayerScore > finalAiScore ? "Victory Achieved!" : finalPlayerScore < finalAiScore ? "AI Prevails." : "Stalemate."}`,
+              variant: finalPlayerScore > finalAiScore ? "default" : "destructive",
+              className: "font-mono"
             });
             return 0;
           }
@@ -219,14 +214,12 @@ export default function RocketRumblePage() {
       if (timerRef.current) clearInterval(timerRef.current);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- playerScore, aiScore needed for toast message
-  }, [gameStatus, toast, playerScore, aiScore]);
+  }, [gameStatus, toast, playerScore, aiScore]); // playerScore, aiScore needed for toast at game end
 
 
-  // Game loop effect
   useEffect(() => {
     if (gameStatus === 'running') {
-      resetGame(); // Initialize targets on game start
+      resetGame(); 
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     } else {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
@@ -247,7 +240,7 @@ export default function RocketRumblePage() {
         playerActionsRef.current.add('rotateRight');
       }
     } else {
-      if (action === 'thrustOff') playerActionsRef.current.delete('thrustOn'); // Assuming 'thrustOff' means stop thrusting
+      if (action === 'thrustOff') playerActionsRef.current.delete('thrustOn'); 
       if (action === 'stopRotate') {
          playerActionsRef.current.delete('rotateLeft');
          playerActionsRef.current.delete('rotateRight');
@@ -258,13 +251,16 @@ export default function RocketRumblePage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground font-mono">
-      <header className="mb-6 w-full max-w-3xl">
+      <header className="mb-6 w-full max-w-2xl"> {/* Increased max-width for scoreboard */}
         <ScoreBoard playerScore={playerScore} aiScore={aiScore} timeLeft={timeLeft} />
       </header>
 
       <main className="mb-6">
-        <Card className="shadow-2xl bg-card border-primary border-2">
-          <CardContent className="p-0"> {/* Remove padding if canvas handles it */}
+        <Card className={cn(
+          "bg-card border-2 border-primary rounded-lg",
+          "shadow-[0_0_15px_hsl(var(--primary)),_0_0_5px_hsl(var(--primary))]" // Neon glow effect
+        )}>
+          <CardContent className="p-0">
             <GameCanvas
               playerRocket={playerRocket}
               aiRocket={aiRocket}
@@ -275,7 +271,7 @@ export default function RocketRumblePage() {
         </Card>
       </main>
 
-      <footer className="flex flex-col items-center space-y-4 w-full max-w-xs">
+      <footer className="flex flex-col items-center space-y-6 w-full max-w-sm"> {/* Increased spacing and max-width */}
         <IQSelector selectedIQ={selectedIQ} onIQChange={handleIQChange} disabled={gameStatus === 'running'} />
         <StartButton gameStatus={gameStatus} onStart={handleStartGame} />
       </footer>

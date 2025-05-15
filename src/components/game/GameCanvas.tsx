@@ -4,6 +4,7 @@
 import type { Rocket, Target, PlayerAction } from '@/types';
 import React, { useRef, useEffect, useCallback } from 'react';
 import { GAME_WIDTH, GAME_HEIGHT } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 interface GameCanvasProps {
   playerRocket: Rocket;
@@ -19,24 +20,32 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.save();
     ctx.translate(rocket.x, rocket.y);
     ctx.rotate(rocket.angle);
+    
+    // Rocket body
     ctx.fillStyle = rocket.color;
-
-    // Draw a triangle for the rocket
     const { size } = rocket;
     ctx.beginPath();
-    ctx.moveTo(size / 2, 0); // Nose
-    ctx.lineTo(-size / 2, -size / 3); // Wing
-    ctx.lineTo(-size / 2, size / 3); // Other wing
+    ctx.moveTo(size / 1.8, 0); // Nose tip
+    ctx.lineTo(-size / 2, -size / 2.8); // Back-left
+    ctx.lineTo(-size / 2.8, 0); // Center-back indent
+    ctx.lineTo(-size / 2, size / 2.8); // Back-right
     ctx.closePath();
     ctx.fill();
+    
+    // Subtle outline
+    ctx.strokeStyle = "hsla(var(--foreground), 0.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     // Draw thrust flame if active
     if (rocket.thrust > 0) {
-      ctx.fillStyle = 'orange';
+      ctx.fillStyle = `hsl(${Math.random() * 20 + 25}, 100%, 60%)`; // Orange-yellow, slightly varying
       ctx.beginPath();
-      ctx.moveTo(-size / 2 - 2, 0);
-      ctx.lineTo(-size - 2, -size / 5);
-      ctx.lineTo(-size - 2, size / 5);
+      const flameLength = size * (0.8 + Math.random() * 0.4);
+      ctx.moveTo(-size / 2.8, 0); // Base of flame
+      ctx.lineTo(-size / 2.8 - flameLength, -size / 4.5);
+      ctx.lineTo(-size / 2.8 - flameLength * 0.8 , 0); // Flicker point
+      ctx.lineTo(-size / 2.8 - flameLength, size / 4.5);
       ctx.closePath();
       ctx.fill();
     }
@@ -48,6 +57,20 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
     ctx.fillStyle = target.color;
     ctx.fill();
+    
+    // Target glow
+    ctx.shadowColor = target.color;
+    ctx.shadowBlur = 10;
+    ctx.fill(); // Fill again to apply shadow to the shape itself
+    ctx.shadowColor = 'transparent'; // Reset shadow
+    ctx.shadowBlur = 0;
+
+    // Target inner detail
+    ctx.beginPath();
+    ctx.arc(target.x, target.y, target.radius * 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = "hsla(var(--background), 0.5)";
+    ctx.fill()
+
     ctx.closePath();
   }, []);
 
@@ -57,14 +80,14 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = 'hsl(var(--background))'; // Use background from CSS vars
+    // Clear canvas with background color
+    ctx.fillStyle = 'hsl(var(--background))';
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     
-    // Draw border
-    ctx.strokeStyle = 'hsl(var(--border))';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    // Draw border (already handled by Card in page.tsx)
+    // ctx.strokeStyle = 'hsl(var(--primary))'; // Use primary from CSS vars
+    // ctx.lineWidth = 2;
+    // ctx.strokeRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
 
     // Draw targets
@@ -80,12 +103,21 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowUp':
+        case 'w':
+        case 'W':
+          e.preventDefault();
           onPlayerAction('thrustOn', true);
           break;
         case 'ArrowLeft':
+        case 'a':
+        case 'A':
+          e.preventDefault();
           onPlayerAction('rotateLeft', true);
           break;
         case 'ArrowRight':
+        case 'd':
+        case 'D':
+          e.preventDefault();
           onPlayerAction('rotateRight', true);
           break;
       }
@@ -94,10 +126,18 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     const handleKeyUp = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowUp':
-          onPlayerAction('thrustOff', false); // or 'thrustOn', false depending on how you handle continuous thrust
+        case 'w':
+        case 'W':
+          e.preventDefault();
+          onPlayerAction('thrustOff', false); 
           break;
         case 'ArrowLeft':
+        case 'a':
+        case 'A':
         case 'ArrowRight':
+        case 'd':
+        case 'D':
+          e.preventDefault();
           onPlayerAction('stopRotate', false);
           break;
       }
@@ -118,8 +158,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
       ref={canvasRef}
       width={GAME_WIDTH}
       height={GAME_HEIGHT}
-      className="rounded-lg shadow-2xl border-2 border-primary"
-      data-ai-hint="space game"
+      className="rounded-lg" // Removed shadow and border, handled by parent Card
+      data-ai-hint="space game battle"
     />
   );
 };
