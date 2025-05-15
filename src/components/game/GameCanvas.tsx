@@ -13,6 +13,11 @@ interface GameCanvasProps {
   onPlayerAction: (action: PlayerAction, active: boolean) => void;
 }
 
+// HSL values from globals.css for canvas drawing
+const CANVAS_BACKGROUND_COLOR = 'hsl(220, 20%, 12%)'; // --background
+const CANVAS_FOREGROUND_COLOR_HSLA = 'hsla(210, 15%, 88%, 0.3)'; // --foreground with alpha
+const CANVAS_BACKGROUND_ACCENT_HSLA = 'hsla(220, 20%, 12%, 0.6)'; // --background with alpha for target inner detail
+
 const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets, onPlayerAction }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -22,7 +27,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.rotate(rocket.angle);
     
     // Rocket body
-    ctx.fillStyle = rocket.color;
+    ctx.fillStyle = rocket.color; // This now receives a direct HSL string from constants
     const { size } = rocket;
     ctx.beginPath();
     ctx.moveTo(size / 1.8, 0); // Nose tip
@@ -33,13 +38,14 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.fill();
     
     // Subtle outline
-    ctx.strokeStyle = "hsla(var(--foreground), 0.3)";
+    ctx.strokeStyle = CANVAS_FOREGROUND_COLOR_HSLA; // Use direct HSLA value
     ctx.lineWidth = 1;
     ctx.stroke();
 
     // Draw thrust flame if active
     if (rocket.thrust > 0) {
-      ctx.fillStyle = `hsl(${Math.random() * 15 + 30}, 100%, 65%)`; // Orange-yellow, slightly varying
+      // This already generates a direct HSL string, so it's fine
+      ctx.fillStyle = `hsl(${Math.random() * 15 + 30}, 100%, 65%)`; 
       ctx.beginPath();
       const flameLength = size * (0.8 + Math.random() * 0.4);
       ctx.moveTo(-size / 2.8, 0); // Base of flame
@@ -55,11 +61,11 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
   const drawTarget = useCallback((ctx: CanvasRenderingContext2D, target: Target) => {
     ctx.beginPath();
     ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
-    ctx.fillStyle = target.color;
+    ctx.fillStyle = target.color; // This now receives a direct HSL string from constants
     ctx.fill();
     
     // Target subtle glow/highlight
-    ctx.shadowColor = target.color;
+    ctx.shadowColor = target.color; // This now receives a direct HSL string
     ctx.shadowBlur = 8;
     ctx.fill(); 
     ctx.shadowColor = 'transparent'; 
@@ -68,7 +74,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     // Target inner detail
     ctx.beginPath();
     ctx.arc(target.x, target.y, target.radius * 0.5, 0, Math.PI * 2);
-    ctx.fillStyle = "hsla(var(--background), 0.6)"; // Slightly more opaque inner circle
+    ctx.fillStyle = CANVAS_BACKGROUND_ACCENT_HSLA; // Use direct HSLA value
     ctx.fill()
 
     ctx.closePath();
@@ -81,7 +87,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     if (!ctx) return;
 
     // Clear canvas with background color
-    ctx.fillStyle = 'hsl(var(--background))';
+    ctx.fillStyle = CANVAS_BACKGROUND_COLOR; // Use direct HSL value
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     
     // Draw targets
@@ -152,11 +158,10 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
       ref={canvasRef}
       width={GAME_WIDTH}
       height={GAME_HEIGHT}
-      className="rounded-md border border-border" // Simple border
+      className="rounded-md border border-border" 
       data-ai-hint="space game battle"
     />
   );
 };
 
 export default GameCanvas;
-
