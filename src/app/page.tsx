@@ -50,6 +50,23 @@ export default function RocketRumblePage() {
 
   const { toast } = useToast();
 
+  // Refs for state values used in loops/intervals to avoid them in dependency arrays
+  const playerRocketRef = useRef(playerRocket);
+  const aiRocketRef = useRef(aiRocket);
+  const targetsRef = useRef(targets);
+  const selectedIQRef = useRef(selectedIQ);
+  const playerScoreRef = useRef(playerScore);
+  const aiScoreRef = useRef(aiScore);
+
+
+  useEffect(() => { playerRocketRef.current = playerRocket; }, [playerRocket]);
+  useEffect(() => { aiRocketRef.current = aiRocket; }, [aiRocket]);
+  useEffect(() => { targetsRef.current = targets; }, [targets]);
+  useEffect(() => { selectedIQRef.current = selectedIQ; }, [selectedIQ]);
+  useEffect(() => { playerScoreRef.current = playerScore; }, [playerScore]);
+  useEffect(() => { aiScoreRef.current = aiScore; }, [aiScore]);
+
+
   const spawnTarget = useCallback((): Target => {
     return {
       id: generateId(),
@@ -78,7 +95,7 @@ export default function RocketRumblePage() {
 
   const handleIQChange = useCallback((value: number) => {
     setSelectedIQ(value);
-  }, []); // Empty dependency array as setSelectedIQ is stable
+  }, []); // setSelectedIQ is stable
 
   const updateRocketPhysics = useCallback((rocket: Rocket, playerInput?: Set<PlayerAction>, aiInput?: AdjustRocketTrajectoryOutput): Rocket => {
     let newRocket = { ...rocket };
@@ -121,8 +138,7 @@ export default function RocketRumblePage() {
     return distance < rocket.size / 2 + target.radius;
   }, []);
 
-
-  const gameLoop = useCallback(() => {
+  const gameLoopStable = useCallback(() => {
     setPlayerRocket(prev => updateRocketPhysics(prev, playerActionsRef.current));
     
     setTargets(prevTargets => {
@@ -130,13 +146,8 @@ export default function RocketRumblePage() {
       let playerHitThisFrame = false;
       let aiHitThisFrame = false;
 
-      // Get current rocket positions for collision checks within this frame
-      // This is a bit tricky because state updates are async.
-      // A potentially more robust way would be to pass current rocket state to checkCollision or update it before this block.
-      // For now, we rely on the fact that playerRocket state would have been updated by setPlayerRocket just before.
-      // AI rocket update is handled in its own interval.
-      const currentPRocket = playerRocket; 
-      const currentAIRocket = aiRocket;
+      const currentPRocket = playerRocketRef.current; 
+      const currentAIRocket = aiRocketRef.current;
 
       newTargets = newTargets.filter(target => {
         if (checkCollision(currentPRocket, target)) {
@@ -161,35 +172,30 @@ export default function RocketRumblePage() {
       return newTargets;
     });
 
-    gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [playerRocket, aiRocket, updateRocketPhysics, checkCollision, spawnTarget]); // Added playerScore, aiScore as they are read indirectly for setPlayerScore/setAiScore logic for consistency
+    gameLoopRef.current = requestAnimationFrame(gameLoopStable);
+  }, [updateRocketPhysics, checkCollision, spawnTarget]);
 
 
   useEffect(() => {
     if (gameStatus === 'running') {
       aiTimerRef.current = setInterval(async () => {
-        if (targets.length === 0) return; 
-        // AI aims for the first target in the list. Could be made more sophisticated.
-        const currentTarget = targets[0]; 
+        if (targetsRef.current.length === 0) return; 
+        const currentTarget = targetsRef.current[0]; 
         
         const input: AdjustRocketTrajectoryInput = {
-          playerRocketPositionX: playerRocket.x,
-          playerRocketPositionY: playerRocket.y,
-          aiRocketPositionX: aiRocket.x,
-          aiRocketPositionY: aiRocket.y,
+          playerRocketPositionX: playerRocketRef.current.x,
+          playerRocketPositionY: playerRocketRef.current.y,
+          aiRocketPositionX: aiRocketRef.current.x,
+          aiRocketPositionY: aiRocketRef.current.y,
           targetPositionX: currentTarget.x,
           targetPositionY: currentTarget.y,
-          aiIqLevel: selectedIQ,
+          aiIqLevel: selectedIQRef.current,
         };
         try {
           const aiDecision = await adjustRocketTrajectory(input);
-          // Update AI rocket based on AI decision
-          // Note: This setAiRocket might be slightly out of sync with the gameLoop's setAiRocket if it were also updating it.
-          // Currently, only this interval updates aiRocket physics based on AI.
           setAiRocket(prev => updateRocketPhysics(prev, undefined, aiDecision));
         } catch (error) {
           console.error("AI trajectory adjustment error:", error);
-          // Fallback: do nothing or a default action if AI fails
           setAiRocket(prev => updateRocketPhysics(prev, undefined, { thrustAdjustment: 0, rotationAdjustment: 0}));
         }
       }, AI_DECISION_INTERVAL);
@@ -197,7 +203,7 @@ export default function RocketRumblePage() {
       if (aiTimerRef.current) clearInterval(aiTimerRef.current);
     }
     return () => { if (aiTimerRef.current) clearInterval(aiTimerRef.current); };
-  }, [gameStatus, aiRocket, playerRocket, targets, selectedIQ, updateRocketPhysics]);
+  }, [gameStatus, updateRocketPhysics]); // updateRocketPhysics is stable
 
 
   useEffect(() => {
@@ -207,12 +213,9 @@ export default function RocketRumblePage() {
           if (prevTime <= 1) {
             setGameStatus('over');
             if (timerRef.current) clearInterval(timerRef.current);
-            // Capture scores at the moment of game over for the toast.
-            // Directly using playerScore and aiScore from state here might show scores from before the very last update.
-            // To be extremely precise, you might need to get them from a ref updated synchronously or pass to setGameStatus.
-            // For now, this is generally acceptable.
-            const finalPlayerScore = playerScore; 
-            const finalAiScore = aiScore;
+            
+            const finalPlayerScore = playerScoreRef.current; 
+            const finalAiScore = aiScoreRef.current;
             toast({ 
               title: "Match Concluded!", 
               description: `Player: ${finalPlayerScore}, AI: ${finalAiScore}. ${finalPlayerScore > finalAiScore ? "Victory Achieved!" : finalPlayerScore < finalAiScore ? "AI Prevails." : "Stalemate."}`,
@@ -228,35 +231,34 @@ export default function RocketRumblePage() {
       if (timerRef.current) clearInterval(timerRef.current);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [gameStatus, toast, playerScore, aiScore]); 
+  }, [gameStatus, toast]); // playerScore and aiScore are accessed via refs
 
 
   useEffect(() => {
     if (gameStatus === 'running') {
-      resetGame(); // Ensure game is reset when status becomes 'running'
-      gameLoopRef.current = requestAnimationFrame(gameLoop);
+      resetGame(); 
+      gameLoopRef.current = requestAnimationFrame(gameLoopStable);
     } else {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     }
     return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
-  }, [gameStatus, gameLoop, resetGame]);
+  }, [gameStatus, gameLoopStable, resetGame]); // gameLoopStable and resetGame are stable
 
 
   const handlePlayerAction = useCallback((action: PlayerAction, active: boolean) => {
     if (active) {
       if (action === 'thrustOn') playerActionsRef.current.add('thrustOn');
       if (action === 'rotateLeft') {
-        playerActionsRef.current.delete('rotateRight'); // Ensure only one rotation active
+        playerActionsRef.current.delete('rotateRight'); 
         playerActionsRef.current.add('rotateLeft');
       }
       if (action === 'rotateRight') {
-        playerActionsRef.current.delete('rotateLeft'); // Ensure only one rotation active
+        playerActionsRef.current.delete('rotateLeft'); 
         playerActionsRef.current.add('rotateRight');
       }
     } else {
-      // Deactivate specific action
       if (action === 'thrustOff') playerActionsRef.current.delete('thrustOn'); 
-      if (action === 'stopRotate') { // A more generic 'stopRotate' might be better than relying on specific key releases if multiple rotation keys exist
+      if (action === 'stopRotate') { 
          playerActionsRef.current.delete('rotateLeft');
          playerActionsRef.current.delete('rotateRight');
       }
@@ -266,7 +268,7 @@ export default function RocketRumblePage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground font-mono">
-      <header className="mb-6 w-full max-w-2xl"> {}
+      <header className="mb-6 w-full max-w-2xl">
         <ScoreBoard playerScore={playerScore} aiScore={aiScore} timeLeft={timeLeft} />
       </header>
 
@@ -286,7 +288,7 @@ export default function RocketRumblePage() {
         </Card>
       </main>
 
-      <footer className="flex flex-col items-center space-y-6 w-full max-w-sm"> {}
+      <footer className="flex flex-col items-center space-y-6 w-full max-w-sm">
         <IQSelector selectedIQ={selectedIQ} onIQChange={handleIQChange} disabled={gameStatus === 'running'} />
         <StartButton gameStatus={gameStatus} onStart={handleStartGame} />
       </footer>
@@ -294,3 +296,4 @@ export default function RocketRumblePage() {
     </div>
   );
 }
+
