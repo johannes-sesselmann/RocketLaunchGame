@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { FC } from 'react';
+import React, { type FC, useCallback } from 'react'; // Added React import for FC and useCallback
 import {
   Select,
   SelectContent,
@@ -20,6 +20,10 @@ interface IQSelectorProps {
 }
 
 const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) => {
+  const handleSelectChange = useCallback((valueString: string) => {
+    onIQChange(Number(valueString));
+  }, [onIQChange]); // Dependency on onIQChange prop
+
   return (
     <div className="flex flex-col space-y-2 w-full">
       <Label htmlFor="iq-selector" className="text-sm font-medium text-foreground/80 flex items-center">
@@ -28,7 +32,7 @@ const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) =
       </Label>
       <Select
         value={String(selectedIQ)}
-        onValueChange={(value) => onIQChange(Number(value))}
+        onValueChange={handleSelectChange} // Use the memoized handler
         disabled={disabled}
       >
         <SelectTrigger 
