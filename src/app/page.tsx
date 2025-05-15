@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 import type { Rocket, Target, GameStatus, PlayerAction } from '@/types';
 import {
-  GAME_WIDTH, GAME_HEIGHT, ROCKET_SIZE, 
+  GAME_WIDTH, GAME_HEIGHT, ROCKET_SIZE,
   PLAYER_ROCKET_BODY_COLOR, AI_ROCKET_BODY_COLOR,
   TARGET_RADIUS, TARGET_COLORS, MAX_TARGETS, GRAVITY, THRUST_POWER, ROTATION_SPEED,
   INITIAL_TIME_LIMIT, IQ_LEVELS, AI_DECISION_INTERVAL
@@ -92,10 +92,10 @@ export default function RocketRumblePage() {
     setGameStatus('running');
     toast({ title: "🚀 Mission Engaged!", description: "Reach the planets. Outmaneuver your rival!", className: "font-sans bg-card text-card-foreground border-primary" });
   };
-  
+
   const handleIQChange = useCallback((value: number) => {
     setSelectedIQ(value);
-  }, []); // setSelectedIQ is stable
+  }, []);
 
 
   const updateRocketPhysics = useCallback((rocket: Rocket, playerInput?: Set<PlayerAction>, aiInput?: AdjustRocketTrajectoryOutput): Rocket => {
@@ -104,12 +104,12 @@ export default function RocketRumblePage() {
     if (playerInput) {
       if (playerInput.has('thrustOn')) newRocket.thrust = 1;
       else newRocket.thrust = 0;
-      
+
       if (playerInput.has('rotateLeft')) newRocket.angle -= ROTATION_SPEED;
       if (playerInput.has('rotateRight')) newRocket.angle += ROTATION_SPEED;
     } else if (aiInput) {
       newRocket.thrust = aiInput.thrustAdjustment > 0 ? 1 : 0;
-      newRocket.angle += aiInput.rotationAdjustment * ROTATION_SPEED * 5; 
+      newRocket.angle += aiInput.rotationAdjustment * ROTATION_SPEED * 5;
     } else {
        newRocket.thrust = 0;
     }
@@ -129,10 +129,10 @@ export default function RocketRumblePage() {
     if (newRocket.x + newRocket.size / 2 > GAME_WIDTH) { newRocket.x = GAME_WIDTH - newRocket.size / 2; newRocket.vx = 0; }
     if (newRocket.y - newRocket.size / 2 < 0) { newRocket.y = newRocket.size / 2; newRocket.vy = 0; }
     if (newRocket.y + newRocket.size / 2 > GAME_HEIGHT) { newRocket.y = GAME_HEIGHT - newRocket.size / 2; newRocket.vy = 0; newRocket.vx = 0; }
-    
+
     return newRocket;
-  }, []); // Dependencies removed by using refs for changing state, ROTATION_SPEED, GRAVITY, THRUST_POWER are constants.
-  
+  }, []);
+
   const checkCollision = useCallback((rocket: Rocket, target: Target): boolean => {
     const dx = rocket.x - target.x;
     const dy = rocket.y - target.y;
@@ -142,34 +142,30 @@ export default function RocketRumblePage() {
 
 
   const gameLoop = useCallback(() => {
-    // Update player rocket based on current actions
     setPlayerRocket(prev => updateRocketPhysics(prev, playerActionsRef.current));
-    // AI rocket is updated by its own timer/effect
-    
-    // Check collisions and update targets
+
     setTargets(prevTargets => {
       let newTargets = [...prevTargets];
       let playerHitThisFrame = false;
       let aiHitThisFrame = false;
 
-      const currentPRocket = playerRocketRef.current; 
+      const currentPRocket = playerRocketRef.current;
       const currentAIRocket = aiRocketRef.current;
 
       newTargets = newTargets.filter(target => {
         if (checkCollision(currentPRocket, target)) {
           setPlayerScore(s => s + 1);
           playerHitThisFrame = true;
-          return false; // Remove target
+          return false;
         }
         if (checkCollision(currentAIRocket, target)) {
           setAiScore(s => s + 1);
           aiHitThisFrame = true;
-          return false; // Remove target
+          return false;
         }
-        return true; // Keep target
+        return true;
       });
 
-      // If any target was hit, spawn new ones to maintain MAX_TARGETS
       if (playerHitThisFrame || aiHitThisFrame) {
          const numTargetsToAdd = MAX_TARGETS - newTargets.length;
          for(let i=0; i < numTargetsToAdd; i++) {
@@ -180,19 +176,16 @@ export default function RocketRumblePage() {
     });
 
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [updateRocketPhysics, checkCollision, spawnTarget]); // spawnTarget is stable
+  }, [updateRocketPhysics, checkCollision, spawnTarget]);
 
 
-  // Effect for AI logic
   useEffect(() => {
     if (gameStatus === 'running') {
       aiTimerRef.current = setInterval(async () => {
-        if (targetsRef.current.length === 0) return; 
-        
-        // AI aims for the closest target (simplistic, can be improved)
-        // Or, for now, just the first target as before
-        const currentTarget = targetsRef.current[0]; 
-        
+        if (targetsRef.current.length === 0) return;
+
+        const currentTarget = targetsRef.current[0];
+
         const input: AdjustRocketTrajectoryInput = {
           playerRocketPositionX: playerRocketRef.current.x,
           playerRocketPositionY: playerRocketRef.current.y,
@@ -207,7 +200,6 @@ export default function RocketRumblePage() {
           setAiRocket(prev => updateRocketPhysics(prev, undefined, aiDecision));
         } catch (error) {
           console.error("AI trajectory adjustment error:", error);
-          // Fallback: do nothing or minimal action if AI fails
           setAiRocket(prev => updateRocketPhysics(prev, undefined, { thrustAdjustment: 0, rotationAdjustment: 0}));
         }
       }, AI_DECISION_INTERVAL);
@@ -215,7 +207,7 @@ export default function RocketRumblePage() {
       if (aiTimerRef.current) clearInterval(aiTimerRef.current);
     }
     return () => { if (aiTimerRef.current) clearInterval(aiTimerRef.current); };
-  }, [gameStatus, updateRocketPhysics]); // updateRocketPhysics is stable
+  }, [gameStatus, updateRocketPhysics]);
 
 
   // Effect for game timer
@@ -226,20 +218,7 @@ export default function RocketRumblePage() {
           if (prevTime <= 1) {
             setGameStatus('over');
             if (timerRef.current) clearInterval(timerRef.current);
-            
-            const finalPlayerScore = playerScoreRef.current; 
-            const finalAiScore = aiScoreRef.current;
-            let toastVariant: "default" | "destructive" = "default";
-            if (finalPlayerScore < finalAiScore) toastVariant = "destructive";
-            else if (finalPlayerScore === finalAiScore) toastVariant = "default";
-
-
-            toast({ 
-              title: "🚀 Mission Complete!", 
-              description: `Player 1: ${finalPlayerScore} | System AI: ${finalAiScore}. ${finalPlayerScore > finalAiScore ? "Humans Prevail!" : finalPlayerScore < finalAiScore ? "AI Dominates!" : "Cosmic Draw!"}`,
-              variant: toastVariant,
-              className: "font-sans bg-card text-card-foreground border-accent"
-            });
+            // Toast call removed from here
             return 0;
           }
           return prevTime - 1;
@@ -249,52 +228,72 @@ export default function RocketRumblePage() {
       if (timerRef.current) clearInterval(timerRef.current);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [gameStatus, toast]); // toast is stable due to useToast hook
+  }, [gameStatus]); // Removed toast from dependencies
+
+  // New effect for showing game over toast
+  useEffect(() => {
+    if (gameStatus === 'over') {
+      const finalPlayerScore = playerScoreRef.current;
+      const finalAiScore = aiScoreRef.current;
+      let toastVariant: "default" | "destructive" = "default";
+      let messageEnd = "Cosmic Draw!";
+
+      if (finalPlayerScore > finalAiScore) {
+        messageEnd = "Humans Prevail!";
+      } else if (finalPlayerScore < finalAiScore) {
+        messageEnd = "AI Dominates!";
+        toastVariant = "destructive";
+      }
+
+      toast({
+        title: "🚀 Mission Complete!",
+        description: `Player 1: ${finalPlayerScore} | System AI: ${finalAiScore}. ${messageEnd}`,
+        variant: toastVariant,
+        className: "font-sans bg-card text-card-foreground border-accent"
+      });
+    }
+  }, [gameStatus, toast]); // Dependencies: gameStatus and toast
 
 
-  // Effect to start/stop game loop
   useEffect(() => {
     if (gameStatus === 'running') {
-      resetGame(); // Reset game state before starting loop
+      resetGame();
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     } else {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     }
     return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
-  }, [gameStatus, gameLoop, resetGame]); // gameLoop and resetGame are stable
+  }, [gameStatus, gameLoop, resetGame]);
 
 
   const handlePlayerAction = useCallback((action: PlayerAction, active: boolean) => {
     if (active) {
       if (action === 'thrustOn') playerActionsRef.current.add('thrustOn');
       if (action === 'rotateLeft') {
-        playerActionsRef.current.delete('rotateRight'); 
+        playerActionsRef.current.delete('rotateRight');
         playerActionsRef.current.add('rotateLeft');
       }
       if (action === 'rotateRight') {
-        playerActionsRef.current.delete('rotateLeft'); 
+        playerActionsRef.current.delete('rotateLeft');
         playerActionsRef.current.add('rotateRight');
       }
     } else {
-      // For keyUp events, 'thrustOff' should correspond to 'thrustOn' being released.
-      // 'stopRotate' handles release of either rotation key.
-      if (action === 'thrustOff') playerActionsRef.current.delete('thrustOn'); 
-      if (action === 'stopRotate') { 
+      if (action === 'thrustOff') playerActionsRef.current.delete('thrustOn');
+      if (action === 'stopRotate') {
          playerActionsRef.current.delete('rotateLeft');
          playerActionsRef.current.delete('rotateRight');
       }
     }
-  }, []); // No dependencies, playerActionsRef is a ref.
+  }, []);
 
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground font-sans">
-      <header className="mb-6 w-full max-w-3xl"> {/* Increased max-width for wider scoreboard */}
+      <header className="mb-6 w-full max-w-3xl">
         <ScoreBoard playerScore={playerScore} aiScore={aiScore} timeLeft={timeLeft} />
       </header>
 
       <main className="mb-6">
-        {/* Removed Card wrapper for direct canvas styling */}
         <GameCanvas
             playerRocket={playerRocket}
             aiRocket={aiRocket}
