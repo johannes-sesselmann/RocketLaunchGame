@@ -4,7 +4,7 @@
 import type { FC } from 'react';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ClockIcon, UserIcon, BotIcon } from 'lucide-react';
+import { ClockIcon, UserIcon, BotIcon, RocketIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ScoreBoardProps {
@@ -13,7 +13,7 @@ interface ScoreBoardProps {
   timeLeft: number;
 }
 
-const ScoreDisplay: FC<{ score: number; initialScore: number; label: string; icon: React.ReactNode }> = ({ score, initialScore, label, icon }) => {
+const ScoreDisplay: FC<{ score: number; initialScore: number; label: string; icon: React.ReactNode, titleColor?: string }> = ({ score, initialScore, label, icon, titleColor = "text-accent" }) => {
   const [displayScore, setDisplayScore] = useState(initialScore);
   const [animate, setAnimate] = useState(false);
 
@@ -34,7 +34,8 @@ const ScoreDisplay: FC<{ score: number; initialScore: number; label: string; ico
       </div>
       <span 
         className={cn(
-          "text-4xl font-bold text-accent font-mono", // Keep mono for score numbers
+          "text-4xl font-bold font-mono", 
+          titleColor,
           { "animate-score-pulse": animate }
         )}
       >
@@ -47,15 +48,16 @@ const ScoreDisplay: FC<{ score: number; initialScore: number; label: string; ico
 
 const ScoreBoard: FC<ScoreBoardProps> = ({ playerScore, aiScore, timeLeft }) => {
   return (
-    <Card className="w-full shadow-lg bg-card/90 border-border">
+    <Card className="w-full shadow-xl bg-card/90 border-border backdrop-blur-sm">
       <CardHeader className="pb-2 pt-4">
-        <CardTitle className="text-center text-3xl font-bold tracking-wider text-primary uppercase font-sans">
-          Boost Brawl
+        <CardTitle className="text-center text-4xl font-extrabold tracking-wider text-accent uppercase font-sans flex items-center justify-center">
+          <RocketIcon className="mr-3 h-8 w-8 text-accent" />
+          ROCKET LAUNCH
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-2 pb-4">
         <div className="flex justify-around items-center">
-          <ScoreDisplay score={playerScore} initialScore={0} label="Player" icon={<UserIcon className="h-5 w-5 text-primary" />} />
+          <ScoreDisplay score={playerScore} initialScore={0} label="Player 1" icon={<UserIcon className="h-5 w-5 text-primary" />} titleColor="text-primary" />
           
           <div className="flex flex-col items-center space-y-1 p-2">
              <div className="flex items-center text-sm text-muted-foreground">
@@ -65,7 +67,7 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ playerScore, aiScore, timeLeft }) => 
             <span className="text-4xl font-bold text-foreground font-mono">{timeLeft}s</span>
           </div>
 
-          <ScoreDisplay score={aiScore} initialScore={0} label="System AI" icon={<BotIcon className="h-5 w-5 text-destructive" />} />
+          <ScoreDisplay score={aiScore} initialScore={0} label="System AI" icon={<BotIcon className="h-5 w-5 text-secondary" />} titleColor="text-secondary" />
         </div>
       </CardContent>
     </Card>
@@ -73,4 +75,3 @@ const ScoreBoard: FC<ScoreBoardProps> = ({ playerScore, aiScore, timeLeft }) => 
 };
 
 export default ScoreBoard;
-

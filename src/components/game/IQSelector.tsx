@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { IQ_LEVELS } from '@/lib/constants';
-import { CpuIcon } from 'lucide-react';
+import { CpuIcon, BrainCircuitIcon } from 'lucide-react'; // Changed icon
 
 interface IQSelectorProps {
   selectedIQ: number;
@@ -27,8 +27,8 @@ const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) =
   return (
     <div className="flex flex-col space-y-2 w-full">
       <Label htmlFor="iq-selector" className="text-sm font-medium text-muted-foreground flex items-center">
-        <CpuIcon className="mr-2 h-4 w-4 text-primary" />
-        AI Adversary Protocol
+        <BrainCircuitIcon className="mr-2 h-5 w-5 text-primary" /> {/* Updated Icon */}
+        AI Pilot Program
       </Label>
       <Select
         value={String(selectedIQ)}
@@ -37,16 +37,16 @@ const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) =
       >
         <SelectTrigger 
           id="iq-selector" 
-          className="w-full bg-input border-border text-foreground focus:ring-ring focus:border-primary hover:border-secondary transition-colors duration-150 ease-in-out"
+          className="w-full bg-input border-border text-foreground focus:ring-2 focus:ring-ring focus:border-primary hover:border-secondary transition-colors duration-150 ease-in-out shadow-md"
         >
-          <SelectValue placeholder="Select AI Protocol..." />
+          <SelectValue placeholder="Select AI Difficulty..." />
         </SelectTrigger>
-        <SelectContent className="bg-popover border-border text-popover-foreground">
+        <SelectContent className="bg-popover border-border text-popover-foreground shadow-lg">
           {IQ_LEVELS.map((level) => (
             <SelectItem 
               key={level.value} 
               value={String(level.value)}
-              className="hover:bg-secondary/70 focus:bg-secondary"
+              className="hover:bg-primary/20 focus:bg-primary/30 text-popover-foreground data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
             >
               {level.label}
             </SelectItem>
@@ -58,4 +58,3 @@ const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) =
 };
 
 export default IQSelector;
-

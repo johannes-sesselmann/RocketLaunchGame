@@ -8,97 +8,97 @@ body {
 
 @layer base {
   :root {
-    /* Steam-inspired Theme */
-    --background: 220 20% 12%; /* Dark bluish-charcoal */
-    --foreground: 210 15% 88%; /* Light gray */
+    /* Rocket Launch Theme (based on provided image) */
+    --background: 270 40% 10%; /* Deep space purple/blue */
+    --foreground: 260 10% 90%; /* Light lavender/white for text */
 
-    --card: 220 20% 18%; /* Slightly lighter dark panel for cards */
-    --card-foreground: 210 15% 88%;
+    --card: 270 35% 15%; /* Slightly lighter deep purple for cards */
+    --card-foreground: 260 10% 90%;
 
-    --popover: 220 20% 16%; /* Popover background */
-    --popover-foreground: 210 15% 88%;
+    --popover: 270 30% 12%; /* Popover background */
+    --popover-foreground: 260 10% 90%;
 
-    --primary: 205 65% 50%; /* Muted/Steam Blue */
-    --primary-foreground: 210 20% 95%; /* Light text on primary */
+    --primary: 320 80% 60%; /* Vibrant Magenta/Pink (Planet Color) */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
 
-    --secondary: 210 15% 35%; /* Medium Gray */
-    --secondary-foreground: 210 15% 88%;
+    --secondary: 200 90% 60%; /* Bright Blue (Planet Color) */
+    --secondary-foreground: 0 0% 100%; /* White text on secondary */
 
-    --muted: 220 15% 25%; /* Muted dark gray tones */
-    --muted-foreground: 210 10% 65%; /* Muted foreground text */
+    --muted: 270 25% 25%; /* Muted purple tones */
+    --muted-foreground: 260 10% 70%; /* Muted foreground text */
 
-    --accent: 35 90% 60%; /* Desaturated Orange/Gold for scores/highlights */
-    --accent-foreground: 220 20% 10%; /* Dark text on accent */
+    --accent: 45 100% 60%; /* Bright Yellow/Orange (Title Color / Highlights) */
+    --accent-foreground: 270 40% 10%; /* Dark text on accent */
 
-    --destructive: 0 70% 55%; /* Standard red for destructive actions */
+    --destructive: 0 70% 55%; /* Standard red for destructive actions - can be kept or themed */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 15% 30%; /* Medium-dark gray for borders */
-    --input: 220 15% 22%; /* Input background, slightly darker than card */
-    --ring: 205 65% 55%; /* Brighter primary blue for focus rings */
+    --border: 270 30% 25%; /* Muted purple for borders */
+    --input: 270 30% 20%; /* Input background */
+    --ring: 320 80% 65%; /* Brighter primary pink for focus rings */
 
-    --chart-1: 205 65% 50%; /* Muted Blue */
-    --chart-2: 35 90% 60%;  /* Desaturated Orange/Gold */
-    --chart-3: 210 15% 50%; /* Medium Gray */
-    --chart-4: 210 15% 88%; /* Light Gray */
-    --chart-5: 0 70% 55%;   /* Red */
-    --radius: 0.375rem; /* Slightly less rounded for a more "classic" UI feel */
+    --chart-1: 320 80% 60%; /* Magenta */
+    --chart-2: 45 100% 60%;  /* Yellow/Orange */
+    --chart-3: 200 90% 60%; /* Bright Blue */
+    --chart-4: 260 10% 80%; /* Light Lavender */
+    --chart-5: 15 90% 55%;   /* Orange/Red Planet */
+    --radius: 0.5rem; /* Slightly more rounded for a playful feel */
 
-    /* Sidebar colors - updated to match new theme */
-    --sidebar-background: 220 20% 14%;
-    --sidebar-foreground: 210 15% 85%;
-    --sidebar-primary: 205 65% 50%;
-    --sidebar-primary-foreground: 210 20% 95%;
-    --sidebar-accent: 35 90% 60%;
-    --sidebar-accent-foreground: 220 20% 10%;
-    --sidebar-border: 210 15% 25%;
-    --sidebar-ring: 205 65% 55%;
+    /* Sidebar colors - can be updated if sidebar is used, for now matching main theme */
+    --sidebar-background: 270 38% 12%;
+    --sidebar-foreground: 260 10% 88%;
+    --sidebar-primary: 320 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 100% 60%;
+    --sidebar-accent-foreground: 270 40% 10%;
+    --sidebar-border: 270 30% 22%;
+    --sidebar-ring: 320 80% 65%;
   }
 
   .dark {
     /* Dark theme is the default and only theme */
-    --background: 220 20% 12%;
-    --foreground: 210 15% 88%;
+    --background: 270 40% 10%;
+    --foreground: 260 10% 90%;
 
-    --card: 220 20% 18%;
-    --card-foreground: 210 15% 88%;
+    --card: 270 35% 15%;
+    --card-foreground: 260 10% 90%;
 
-    --popover: 220 20% 16%;
-    --popover-foreground: 210 15% 88%;
+    --popover: 270 30% 12%;
+    --popover-foreground: 260 10% 90%;
 
-    --primary: 205 65% 50%;
-    --primary-foreground: 210 20% 95%;
+    --primary: 320 80% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 35%;
-    --secondary-foreground: 210 15% 88%;
+    --secondary: 200 90% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 15% 25%;
-    --muted-foreground: 210 10% 65%;
+    --muted: 270 25% 25%;
+    --muted-foreground: 260 10% 70%;
 
-    --accent: 35 90% 60%;
-    --accent-foreground: 220 20% 10%;
+    --accent: 45 100% 60%;
+    --accent-foreground: 270 40% 10%;
 
     --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 15% 30%;
-    --input: 220 15% 22%;
-    --ring: 205 65% 55%;
+    --border: 270 30% 25%;
+    --input: 270 30% 20%;
+    --ring: 320 80% 65%;
     
-    --chart-1: 205 65% 50%;
-    --chart-2: 35 90% 60%;
-    --chart-3: 210 15% 50%;
-    --chart-4: 210 15% 88%;
+    --chart-1: 320 80% 60%;
+    --chart-2: 45 100% 60%;
+    --chart-3: 200 90% 60%;
+    --chart-4: 260 10% 80%;
     --chart-5: 0 60% 50%;
 
-    --sidebar-background: 220 20% 14%;
-    --sidebar-foreground: 210 15% 85%;
-    --sidebar-primary: 205 65% 50%;
-    --sidebar-primary-foreground: 210 20% 95%;
-    --sidebar-accent: 35 90% 60%;
-    --sidebar-accent-foreground: 220 20% 10%;
-    --sidebar-border: 210 15% 25%;
-    --sidebar-ring: 205 65% 55%;
+    --sidebar-background: 270 38% 12%;
+    --sidebar-foreground: 260 10% 88%;
+    --sidebar-primary: 320 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 45 100% 60%;
+    --sidebar-accent-foreground: 270 40% 10%;
+    --sidebar-border: 270 30% 22%;
+    --sidebar-ring: 320 80% 65%;
   }
 }
 
@@ -111,15 +111,14 @@ body {
   }
 }
 
-/* Score animation - can be kept if subtle, or removed if not fitting Steam theme */
 @keyframes score-pulse-animation {
   0%, 100% {
     transform: scale(1);
-    /* text-shadow: 0 0 3px hsl(var(--accent) / 0.5); */
+    text-shadow: 0 0 5px hsl(var(--accent) / 0.7);
   }
   50% {
     transform: scale(1.1);
-    /* text-shadow: 0 0 8px hsl(var(--accent)), 0 0 15px hsl(var(--accent) / 0.5); */
+    text-shadow: 0 0 10px hsl(var(--accent)), 0 0 18px hsl(var(--accent) / 0.7);
   }
 }
 

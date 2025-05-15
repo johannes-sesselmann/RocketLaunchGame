@@ -15,7 +15,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Boost Brawl',
+  title: 'ROCKET LAUNCH',
   description: 'A 2D rocket game: player vs AI. Reach targets to score!',
 };
 
@@ -33,4 +33,3 @@ export default function RootLayout({
     </html>
   );
 }
-

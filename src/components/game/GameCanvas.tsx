@@ -3,7 +3,12 @@
 
 import type { Rocket, Target, PlayerAction } from '@/types';
 import React, { useRef, useEffect, useCallback } from 'react';
-import { GAME_WIDTH, GAME_HEIGHT } from '@/lib/constants';
+import { 
+  GAME_WIDTH, GAME_HEIGHT, 
+  PLAYER_ROCKET_BODY_COLOR, PLAYER_ROCKET_NOSE_COLOR, PLAYER_ROCKET_WINDOW_COLOR, PLAYER_ROCKET_FLAME_COLOR_1, PLAYER_ROCKET_FLAME_COLOR_2,
+  AI_ROCKET_BODY_COLOR, AI_ROCKET_NOSE_COLOR, AI_ROCKET_WINDOW_COLOR, AI_ROCKET_FLAME_COLOR_1, AI_ROCKET_FLAME_COLOR_2,
+  CANVAS_BG_COLOR_HSL, CANVAS_TARGET_OUTLINE_HSLA, CANVAS_TARGET_INNER_HSLA
+} from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 interface GameCanvasProps {
@@ -13,11 +18,6 @@ interface GameCanvasProps {
   onPlayerAction: (action: PlayerAction, active: boolean) => void;
 }
 
-// HSL values from globals.css for canvas drawing
-const CANVAS_BACKGROUND_COLOR = 'hsl(220, 20%, 12%)'; // --background
-const CANVAS_FOREGROUND_COLOR_HSLA = 'hsla(210, 15%, 88%, 0.3)'; // --foreground with alpha
-const CANVAS_BACKGROUND_ACCENT_HSLA = 'hsla(220, 20%, 12%, 0.6)'; // --background with alpha for target inner detail
-
 const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets, onPlayerAction }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -26,32 +26,88 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.translate(rocket.x, rocket.y);
     ctx.rotate(rocket.angle);
     
-    // Rocket body
-    ctx.fillStyle = rocket.color; // This now receives a direct HSL string from constants
     const { size } = rocket;
+    const bodyWidth = size * 0.6;
+    const bodyHeight = size * 1.3; // Main body length
+    const noseHeight = size * 0.7;
+    const finSize = size * 0.4;
+
+    let bodyColor = PLAYER_ROCKET_BODY_COLOR;
+    let noseColor = PLAYER_ROCKET_NOSE_COLOR;
+    let windowColor = PLAYER_ROCKET_WINDOW_COLOR;
+    let flame1 = PLAYER_ROCKET_FLAME_COLOR_1;
+    let flame2 = PLAYER_ROCKET_FLAME_COLOR_2;
+
+    if (rocket.id === 'ai') {
+      bodyColor = AI_ROCKET_BODY_COLOR;
+      noseColor = AI_ROCKET_NOSE_COLOR;
+      windowColor = AI_ROCKET_WINDOW_COLOR;
+      flame1 = AI_ROCKET_FLAME_COLOR_1;
+      flame2 = AI_ROCKET_FLAME_COLOR_2;
+    }
+
+    // Fins (draw behind body)
+    ctx.fillStyle = noseColor; // Fins match nose
     ctx.beginPath();
-    ctx.moveTo(size / 1.8, 0); // Nose tip
-    ctx.lineTo(-size / 2, -size / 2.8); // Back-left
-    ctx.lineTo(-size / 2.8, 0); // Center-back indent
-    ctx.lineTo(-size / 2, size / 2.8); // Back-right
+    ctx.moveTo(-bodyWidth / 2, bodyHeight / 2 - finSize*0.2);
+    ctx.lineTo(-bodyWidth / 2 - finSize, bodyHeight / 2 + finSize * 0.5);
+    ctx.lineTo(-bodyWidth / 2, bodyHeight / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(bodyWidth / 2, bodyHeight / 2 - finSize*0.2);
+    ctx.lineTo(bodyWidth / 2 + finSize, bodyHeight / 2 + finSize * 0.5);
+    ctx.lineTo(bodyWidth / 2, bodyHeight / 2);
     ctx.closePath();
     ctx.fill();
     
-    // Subtle outline
-    ctx.strokeStyle = CANVAS_FOREGROUND_COLOR_HSLA; // Use direct HSLA value
+    // Rocket Body (rounded rectangle)
+    ctx.fillStyle = bodyColor;
+    ctx.beginPath();
+    ctx.roundRect(-bodyWidth / 2, -bodyHeight / 2, bodyWidth, bodyHeight, size * 0.1);
+    ctx.fill();
+    ctx.strokeStyle = "hsl(0, 0%, 60%)"; // Darker grey outline
     ctx.lineWidth = 1;
     ctx.stroke();
 
+    // Nose Cone
+    ctx.fillStyle = noseColor;
+    ctx.beginPath();
+    ctx.moveTo(0, -bodyHeight / 2 - noseHeight); // Tip of the nose
+    ctx.lineTo(-bodyWidth / 2, -bodyHeight / 2);
+    ctx.lineTo(bodyWidth / 2, -bodyHeight / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Window
+    ctx.fillStyle = windowColor;
+    ctx.beginPath();
+    ctx.arc(0, -bodyHeight / 2 * 0.3, size * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = bodyColor; // Body color as highlight/inner ring
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+
     // Draw thrust flame if active
     if (rocket.thrust > 0) {
-      // This already generates a direct HSL string, so it's fine
-      ctx.fillStyle = `hsl(${Math.random() * 15 + 30}, 100%, 65%)`; 
+      const flameLength = size * (1.2 + Math.random() * 0.5);
+      const flameWidth = bodyWidth * 0.8;
+      
+      ctx.fillStyle = flame1; 
       ctx.beginPath();
-      const flameLength = size * (0.8 + Math.random() * 0.4);
-      ctx.moveTo(-size / 2.8, 0); // Base of flame
-      ctx.lineTo(-size / 2.8 - flameLength, -size / 4.5);
-      ctx.lineTo(-size / 2.8 - flameLength * 0.8 , 0); // Flicker point
-      ctx.lineTo(-size / 2.8 - flameLength, size / 4.5);
+      ctx.moveTo(-flameWidth / 2, bodyHeight / 2);
+      ctx.lineTo(flameWidth / 2, bodyHeight / 2);
+      ctx.lineTo(0, bodyHeight / 2 + flameLength);
+      ctx.closePath();
+      ctx.fill();
+      
+      ctx.fillStyle = flame2;
+      ctx.beginPath();
+      ctx.moveTo(-flameWidth / 3, bodyHeight / 2);
+      ctx.lineTo(flameWidth / 3, bodyHeight / 2);
+      ctx.lineTo(0, bodyHeight / 2 + flameLength * 0.7);
       ctx.closePath();
       ctx.fill();
     }
@@ -61,21 +117,35 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
   const drawTarget = useCallback((ctx: CanvasRenderingContext2D, target: Target) => {
     ctx.beginPath();
     ctx.arc(target.x, target.y, target.radius, 0, Math.PI * 2);
-    ctx.fillStyle = target.color; // This now receives a direct HSL string from constants
+    ctx.fillStyle = target.color; 
     ctx.fill();
     
-    // Target subtle glow/highlight
-    ctx.shadowColor = target.color; // This now receives a direct HSL string
-    ctx.shadowBlur = 8;
+    ctx.shadowColor = target.color; 
+    ctx.shadowBlur = 10;
     ctx.fill(); 
     ctx.shadowColor = 'transparent'; 
     ctx.shadowBlur = 0;
 
-    // Target inner detail
-    ctx.beginPath();
-    ctx.arc(target.x, target.y, target.radius * 0.5, 0, Math.PI * 2);
-    ctx.fillStyle = CANVAS_BACKGROUND_ACCENT_HSLA; // Use direct HSLA value
-    ctx.fill()
+    // Simple craters for planet-like effect
+    ctx.fillStyle = CANVAS_TARGET_INNER_HSLA;
+    const numCraters = 3 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < numCraters; i++) {
+        const craterX = target.x + (Math.random() - 0.5) * target.radius * 1.2;
+        const craterY = target.y + (Math.random() - 0.5) * target.radius * 1.2;
+        const craterRadius = target.radius * (0.15 + Math.random() * 0.2);
+        
+        // Ensure crater is somewhat within the main circle for a better look
+        const distSq = (craterX - target.x)**2 + (craterY - target.y)**2;
+        if (distSq < (target.radius - craterRadius)**2) {
+            ctx.beginPath();
+            ctx.arc(craterX, craterY, craterRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    
+    ctx.strokeStyle = CANVAS_TARGET_OUTLINE_HSLA;
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     ctx.closePath();
   }, []);
@@ -86,14 +156,11 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas with background color
-    ctx.fillStyle = CANVAS_BACKGROUND_COLOR; // Use direct HSL value
+    ctx.fillStyle = CANVAS_BG_COLOR_HSL;
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     
-    // Draw targets
     targets.forEach(target => drawTarget(ctx, target));
 
-    // Draw rockets
     drawRocket(ctx, playerRocket);
     drawRocket(ctx, aiRocket);
 
@@ -158,8 +225,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
       ref={canvasRef}
       width={GAME_WIDTH}
       height={GAME_HEIGHT}
-      className="rounded-md border border-border" 
-      data-ai-hint="space game battle"
+      className="rounded-lg border-2 border-primary shadow-2xl shadow-primary/30" 
+      data-ai-hint="space planets rocket"
     />
   );
 };
