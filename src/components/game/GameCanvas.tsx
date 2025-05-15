@@ -33,13 +33,13 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.fill();
     
     // Subtle outline
-    ctx.strokeStyle = "hsla(var(--foreground), 0.5)";
+    ctx.strokeStyle = "hsla(var(--foreground), 0.3)";
     ctx.lineWidth = 1;
     ctx.stroke();
 
     // Draw thrust flame if active
     if (rocket.thrust > 0) {
-      ctx.fillStyle = `hsl(${Math.random() * 20 + 25}, 100%, 60%)`; // Orange-yellow, slightly varying
+      ctx.fillStyle = `hsl(${Math.random() * 15 + 30}, 100%, 65%)`; // Orange-yellow, slightly varying
       ctx.beginPath();
       const flameLength = size * (0.8 + Math.random() * 0.4);
       ctx.moveTo(-size / 2.8, 0); // Base of flame
@@ -58,17 +58,17 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.fillStyle = target.color;
     ctx.fill();
     
-    // Target glow
+    // Target subtle glow/highlight
     ctx.shadowColor = target.color;
-    ctx.shadowBlur = 10;
-    ctx.fill(); // Fill again to apply shadow to the shape itself
-    ctx.shadowColor = 'transparent'; // Reset shadow
+    ctx.shadowBlur = 8;
+    ctx.fill(); 
+    ctx.shadowColor = 'transparent'; 
     ctx.shadowBlur = 0;
 
     // Target inner detail
     ctx.beginPath();
-    ctx.arc(target.x, target.y, target.radius * 0.6, 0, Math.PI * 2);
-    ctx.fillStyle = "hsla(var(--background), 0.5)";
+    ctx.arc(target.x, target.y, target.radius * 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = "hsla(var(--background), 0.6)"; // Slightly more opaque inner circle
     ctx.fill()
 
     ctx.closePath();
@@ -84,12 +84,6 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
     ctx.fillStyle = 'hsl(var(--background))';
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     
-    // Draw border (already handled by Card in page.tsx)
-    // ctx.strokeStyle = 'hsl(var(--primary))'; // Use primary from CSS vars
-    // ctx.lineWidth = 2;
-    // ctx.strokeRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-
     // Draw targets
     targets.forEach(target => drawTarget(ctx, target));
 
@@ -158,10 +152,11 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ playerRocket, aiRocket, targets
       ref={canvasRef}
       width={GAME_WIDTH}
       height={GAME_HEIGHT}
-      className="rounded-lg" // Removed shadow and border, handled by parent Card
+      className="rounded-md border border-border" // Simple border
       data-ai-hint="space game battle"
     />
   );
 };
 
 export default GameCanvas;
+

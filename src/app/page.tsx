@@ -50,7 +50,6 @@ export default function RocketRumblePage() {
 
   const { toast } = useToast();
 
-  // Refs for state values used in loops/intervals to avoid them in dependency arrays
   const playerRocketRef = useRef(playerRocket);
   const aiRocketRef = useRef(aiRocket);
   const targetsRef = useRef(targets);
@@ -90,12 +89,12 @@ export default function RocketRumblePage() {
   const handleStartGame = () => {
     resetGame();
     setGameStatus('running');
-    toast({ title: "Match Initiated!", description: "Objective: Secure targets. Evade opponent.", className: "font-mono" });
+    toast({ title: "Match Initiated!", description: "Objective: Secure targets. Evade opponent.", className: "font-sans" });
   };
 
   const handleIQChange = useCallback((value: number) => {
     setSelectedIQ(value);
-  }, []); // setSelectedIQ is stable
+  }, []); 
 
   const updateRocketPhysics = useCallback((rocket: Rocket, playerInput?: Set<PlayerAction>, aiInput?: AdjustRocketTrajectoryOutput): Rocket => {
     let newRocket = { ...rocket };
@@ -203,7 +202,7 @@ export default function RocketRumblePage() {
       if (aiTimerRef.current) clearInterval(aiTimerRef.current);
     }
     return () => { if (aiTimerRef.current) clearInterval(aiTimerRef.current); };
-  }, [gameStatus, updateRocketPhysics]); // updateRocketPhysics is stable
+  }, [gameStatus, updateRocketPhysics]); 
 
 
   useEffect(() => {
@@ -220,7 +219,7 @@ export default function RocketRumblePage() {
               title: "Match Concluded!", 
               description: `Player: ${finalPlayerScore}, AI: ${finalAiScore}. ${finalPlayerScore > finalAiScore ? "Victory Achieved!" : finalPlayerScore < finalAiScore ? "AI Prevails." : "Stalemate."}`,
               variant: finalPlayerScore > finalAiScore ? "default" : "destructive",
-              className: "font-mono"
+              className: "font-sans"
             });
             return 0;
           }
@@ -231,7 +230,7 @@ export default function RocketRumblePage() {
       if (timerRef.current) clearInterval(timerRef.current);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [gameStatus, toast]); // playerScore and aiScore are accessed via refs
+  }, [gameStatus, toast]); 
 
 
   useEffect(() => {
@@ -242,7 +241,7 @@ export default function RocketRumblePage() {
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
     }
     return () => { if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current); };
-  }, [gameStatus, gameLoopStable, resetGame]); // gameLoopStable and resetGame are stable
+  }, [gameStatus, gameLoopStable, resetGame]); 
 
 
   const handlePlayerAction = useCallback((action: PlayerAction, active: boolean) => {
@@ -267,16 +266,13 @@ export default function RocketRumblePage() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground font-mono">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background text-foreground font-sans">
       <header className="mb-6 w-full max-w-2xl">
         <ScoreBoard playerScore={playerScore} aiScore={aiScore} timeLeft={timeLeft} />
       </header>
 
       <main className="mb-6">
-        <Card className={cn(
-          "bg-card border-2 border-primary rounded-lg",
-          "shadow-[0_0_15px_hsl(var(--primary)),_0_0_5px_hsl(var(--primary))]" 
-        )}>
+        <Card className="bg-card border border-border rounded-lg shadow-lg">
           <CardContent className="p-0">
             <GameCanvas
               playerRocket={playerRocket}

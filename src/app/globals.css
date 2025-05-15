@@ -8,96 +8,97 @@ body {
 
 @layer base {
   :root {
-    --background: 240 50% 6%; /* Very dark desaturated blue */
-    --foreground: 200 100% 90%; /* Light cyan-ish white */
+    /* Steam-inspired Theme */
+    --background: 220 20% 12%; /* Dark bluish-charcoal */
+    --foreground: 210 15% 88%; /* Light gray */
 
-    --card: 240 40% 10%; /* Darker panel for cards */
-    --card-foreground: 200 100% 90%;
+    --card: 220 20% 18%; /* Slightly lighter dark panel for cards */
+    --card-foreground: 210 15% 88%;
 
-    --popover: 240 40% 9%; /* Popover background */
-    --popover-foreground: 200 100% 90%;
+    --popover: 220 20% 16%; /* Popover background */
+    --popover-foreground: 210 15% 88%;
 
-    --primary: 180 100% 50%; /* Pure Cyan */
-    --primary-foreground: 240 50% 5%; /* Dark text on cyan */
+    --primary: 205 65% 50%; /* Muted/Steam Blue */
+    --primary-foreground: 210 20% 95%; /* Light text on primary */
 
-    --secondary: 260 60% 40%; /* Deep vibrant purple */
-    --secondary-foreground: 200 100% 90%;
+    --secondary: 210 15% 35%; /* Medium Gray */
+    --secondary-foreground: 210 15% 88%;
 
-    --muted: 240 30% 25%; /* Muted tones */
-    --muted-foreground: 200 80% 75%;
+    --muted: 220 15% 25%; /* Muted dark gray tones */
+    --muted-foreground: 210 10% 65%; /* Muted foreground text */
 
-    --accent: 300 100% 60%; /* Vibrant Magenta */
-    --accent-foreground: 240 50% 5%; /* Dark text on magenta */
+    --accent: 35 90% 60%; /* Desaturated Orange/Gold for scores/highlights */
+    --accent-foreground: 220 20% 10%; /* Dark text on accent */
 
-    --destructive: 0 70% 55%; /* Bright red for destructive actions */
+    --destructive: 0 70% 55%; /* Standard red for destructive actions */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 180 80% 40%; /* Slightly desaturated cyan for borders */
-    --input: 240 30% 18%; /* Input background */
-    --ring: 180 100% 60%; /* Brighter cyan for focus rings */
+    --border: 210 15% 30%; /* Medium-dark gray for borders */
+    --input: 220 15% 22%; /* Input background, slightly darker than card */
+    --ring: 205 65% 55%; /* Brighter primary blue for focus rings */
 
-    --chart-1: 180 100% 50%; /* Cyan */
-    --chart-2: 300 100% 60%; /* Magenta */
-    --chart-3: 260 60% 40%; /* Purple */
-    --chart-4: 200 100% 90%; /* Light Cyan White */
+    --chart-1: 205 65% 50%; /* Muted Blue */
+    --chart-2: 35 90% 60%;  /* Desaturated Orange/Gold */
+    --chart-3: 210 15% 50%; /* Medium Gray */
+    --chart-4: 210 15% 88%; /* Light Gray */
     --chart-5: 0 70% 55%;   /* Red */
-    --radius: 0.5rem;
+    --radius: 0.375rem; /* Slightly less rounded for a more "classic" UI feel */
 
     /* Sidebar colors - updated to match new theme */
-    --sidebar-background: 240 50% 8%;
-    --sidebar-foreground: 200 100% 85%;
-    --sidebar-primary: 180 100% 50%;
-    --sidebar-primary-foreground: 240 50% 5%;
-    --sidebar-accent: 300 100% 60%;
-    --sidebar-accent-foreground: 240 50% 5%;
-    --sidebar-border: 180 80% 30%;
-    --sidebar-ring: 180 100% 60%;
+    --sidebar-background: 220 20% 14%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 205 65% 50%;
+    --sidebar-primary-foreground: 210 20% 95%;
+    --sidebar-accent: 35 90% 60%;
+    --sidebar-accent-foreground: 220 20% 10%;
+    --sidebar-border: 210 15% 25%;
+    --sidebar-ring: 205 65% 55%;
   }
 
   .dark {
-    /* Dark theme is the default and only theme for this sci-fi look */
-    --background: 240 50% 6%;
-    --foreground: 200 100% 90%;
+    /* Dark theme is the default and only theme */
+    --background: 220 20% 12%;
+    --foreground: 210 15% 88%;
 
-    --card: 240 40% 10%;
-    --card-foreground: 200 100% 90%;
+    --card: 220 20% 18%;
+    --card-foreground: 210 15% 88%;
 
-    --popover: 240 40% 9%;
-    --popover-foreground: 200 100% 90%;
+    --popover: 220 20% 16%;
+    --popover-foreground: 210 15% 88%;
 
-    --primary: 180 100% 50%;
-    --primary-foreground: 240 50% 5%;
+    --primary: 205 65% 50%;
+    --primary-foreground: 210 20% 95%;
 
-    --secondary: 260 60% 40%;
-    --secondary-foreground: 200 100% 90%;
+    --secondary: 210 15% 35%;
+    --secondary-foreground: 210 15% 88%;
 
-    --muted: 240 30% 25%;
-    --muted-foreground: 200 80% 75%;
+    --muted: 220 15% 25%;
+    --muted-foreground: 210 10% 65%;
 
-    --accent: 300 100% 60%;
-    --accent-foreground: 240 50% 5%;
+    --accent: 35 90% 60%;
+    --accent-foreground: 220 20% 10%;
 
     --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 180 80% 40%;
-    --input: 240 30% 18%;
-    --ring: 180 100% 60%;
+    --border: 210 15% 30%;
+    --input: 220 15% 22%;
+    --ring: 205 65% 55%;
     
-    --chart-1: 180 100% 50%;
-    --chart-2: 300 100% 60%;
-    --chart-3: 260 60% 40%;
-    --chart-4: 200 100% 90%;
+    --chart-1: 205 65% 50%;
+    --chart-2: 35 90% 60%;
+    --chart-3: 210 15% 50%;
+    --chart-4: 210 15% 88%;
     --chart-5: 0 60% 50%;
 
-    --sidebar-background: 240 50% 8%;
-    --sidebar-foreground: 200 100% 85%;
-    --sidebar-primary: 180 100% 50%;
-    --sidebar-primary-foreground: 240 50% 5%;
-    --sidebar-accent: 300 100% 60%;
-    --sidebar-accent-foreground: 240 50% 5%;
-    --sidebar-border: 180 80% 30%;
-    --sidebar-ring: 180 100% 60%;
+    --sidebar-background: 220 20% 14%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 205 65% 50%;
+    --sidebar-primary-foreground: 210 20% 95%;
+    --sidebar-accent: 35 90% 60%;
+    --sidebar-accent-foreground: 220 20% 10%;
+    --sidebar-border: 210 15% 25%;
+    --sidebar-ring: 205 65% 55%;
   }
 }
 
@@ -110,36 +111,18 @@ body {
   }
 }
 
-/* Score animation */
+/* Score animation - can be kept if subtle, or removed if not fitting Steam theme */
 @keyframes score-pulse-animation {
   0%, 100% {
     transform: scale(1);
-    text-shadow: 0 0 5px hsl(var(--accent) / 0.7);
+    /* text-shadow: 0 0 3px hsl(var(--accent) / 0.5); */
   }
   50% {
-    transform: scale(1.15);
-    text-shadow: 0 0 15px hsl(var(--accent)), 0 0 25px hsl(var(--accent) / 0.7);
+    transform: scale(1.1);
+    /* text-shadow: 0 0 8px hsl(var(--accent)), 0 0 15px hsl(var(--accent) / 0.5); */
   }
 }
 
 .animate-score-pulse {
-  animation: score-pulse-animation 0.5s ease-in-out;
-}
-
-/* Neon glow effect for buttons and cards */
-.neon-glow-primary {
-  box-shadow: 0 0 5px hsl(var(--primary)),
-              0 0 10px hsl(var(--primary) / 0.8),
-              0 0 15px hsl(var(--primary) / 0.6);
-}
-.neon-glow-accent {
-   box-shadow: 0 0 5px hsl(var(--accent)),
-              0 0 10px hsl(var(--accent) / 0.8),
-              0 0 15px hsl(var(--accent) / 0.6);
-}
-
-.hover-neon-glow-primary:hover {
-  box-shadow: 0 0 8px hsl(var(--primary)),
-              0 0 15px hsl(var(--primary) / 0.8),
-              0 0 25px hsl(var(--primary) / 0.6);
+  animation: score-pulse-animation 0.4s ease-in-out;
 }

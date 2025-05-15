@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { type FC, useCallback } from 'react'; // Added React import for FC and useCallback
+import React, { type FC, useCallback } from 'react';
 import {
   Select,
   SelectContent,
@@ -22,31 +22,31 @@ interface IQSelectorProps {
 const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) => {
   const handleSelectChange = useCallback((valueString: string) => {
     onIQChange(Number(valueString));
-  }, [onIQChange]); // Dependency on onIQChange prop
+  }, [onIQChange]);
 
   return (
     <div className="flex flex-col space-y-2 w-full">
-      <Label htmlFor="iq-selector" className="text-sm font-medium text-foreground/80 flex items-center">
+      <Label htmlFor="iq-selector" className="text-sm font-medium text-muted-foreground flex items-center">
         <CpuIcon className="mr-2 h-4 w-4 text-primary" />
         AI Adversary Protocol
       </Label>
       <Select
         value={String(selectedIQ)}
-        onValueChange={handleSelectChange} // Use the memoized handler
+        onValueChange={handleSelectChange}
         disabled={disabled}
       >
         <SelectTrigger 
           id="iq-selector" 
-          className="w-full bg-input border-primary/50 text-foreground focus:ring-primary focus:border-primary hover:border-primary transition-all duration-200 ease-in-out hover:shadow-[0_0_8px_hsl(var(--primary)/0.5)]"
+          className="w-full bg-input border-border text-foreground focus:ring-ring focus:border-primary hover:border-secondary transition-colors duration-150 ease-in-out"
         >
           <SelectValue placeholder="Select AI Protocol..." />
         </SelectTrigger>
-        <SelectContent className="bg-popover border-primary/70 text-popover-foreground">
+        <SelectContent className="bg-popover border-border text-popover-foreground">
           {IQ_LEVELS.map((level) => (
             <SelectItem 
               key={level.value} 
               value={String(level.value)}
-              className="hover:bg-primary/20 focus:bg-primary/30"
+              className="hover:bg-secondary/70 focus:bg-secondary"
             >
               {level.label}
             </SelectItem>
@@ -58,3 +58,4 @@ const IQSelector: FC<IQSelectorProps> = ({ selectedIQ, onIQChange, disabled }) =
 };
 
 export default IQSelector;
+
