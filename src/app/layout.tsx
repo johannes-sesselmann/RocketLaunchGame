@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark"> {/* Assuming a dark theme is default */}
+    <html lang="en" className="dark">
       <body className={`${inter.variable} ${robotoMono.variable} antialiased bg-background text-foreground`}>
         {children}
         <Toaster /> {/* Global Toaster for notifications */}
